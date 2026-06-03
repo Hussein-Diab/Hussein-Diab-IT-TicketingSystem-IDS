@@ -10,7 +10,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Roles
+
         DB::table('Roles')->insert([
             ['Name' => 'Admin',    'created_at' => now(), 'updated_at' => now()],
             ['Name' => 'Agent',    'created_at' => now(), 'updated_at' => now()],
@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
             ['Name' => 'Manager',  'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        // Categories
         DB::table('Categories')->insert([
             ['Name' => 'Hardware',       'created_at' => now(), 'updated_at' => now()],
             ['Name' => 'Software',       'created_at' => now(), 'updated_at' => now()],
@@ -28,7 +27,6 @@ class DatabaseSeeder extends Seeder
             ['Name' => 'Other',          'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        // Priorities
         DB::table('Priorities')->insert([
             ['Name' => 'Low',      'created_at' => now(), 'updated_at' => now()],
             ['Name' => 'Medium',   'created_at' => now(), 'updated_at' => now()],
@@ -36,7 +34,6 @@ class DatabaseSeeder extends Seeder
             ['Name' => 'Critical', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        // Statuses
         DB::table('Statuses')->insert([
             ['Name' => 'Open',        'created_at' => now(), 'updated_at' => now()],
             ['Name' => 'In Progress', 'created_at' => now(), 'updated_at' => now()],
@@ -45,7 +42,6 @@ class DatabaseSeeder extends Seeder
             ['Name' => 'Closed',      'created_at' => now(), 'updated_at' => now()],
         ]);
 
-        // Users
         DB::table('Users')->insert([
             [
                 'Name'       => 'Admin User',
