@@ -4,5 +4,7 @@ This is an IT Ticketing System project developed using Laravel for IDS Internshi
 
 ## Description
 A web-based system that allows users to create, manage, and track IT support tickets efficiently.
+## ER Diagram
+![IT Ticketing System ER Diagram](ERD.png)
 ## Author
 Hussein Diab

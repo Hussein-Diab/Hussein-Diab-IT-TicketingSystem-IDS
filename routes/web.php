@@ -9,9 +9,15 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+
 Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
+
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+
+
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 
 Route::middleware('jwt.cookie')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -23,3 +29,6 @@ Route::middleware('jwt.cookie')->group(function () {
     Route::put('/tickets/{id}',  [TicketController::class, 'update']);
     Route::delete('/tickets/{id}',  [TicketController::class, 'destroy']);
 });
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+

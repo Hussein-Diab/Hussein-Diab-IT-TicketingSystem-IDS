@@ -3,9 +3,9 @@
 namespace App\Models; 
 
 use Illuminate\Foundation\Auth\User as Authenticatable; 
-use Tymon\JWTAuth\Contracts\JWTSubject; // <-- 1. Added missing import
+use Tymon\JWTAuth\Contracts\JWTSubject; 
 
-class User extends Authenticatable implements JWTSubject // <-- 2. Added interface implementation
+class User extends Authenticatable implements JWTSubject 
 { 
     protected $table = 'Users'; 
     protected $primaryKey = 'Id'; 
@@ -26,19 +26,11 @@ class User extends Authenticatable implements JWTSubject // <-- 2. Added interfa
         return $this->Password; 
     }
 
-
-
-    /**
-     * Tells JWT which field is the user's unique ID
-     */
     public function getJWTIdentifier() 
     { 
-        return $this->getKey(); // returns user id (in your case, 'Id')
+        return $this->getKey();
     } 
 
-    /**
-     * Extra data to put inside the token (we leave empty)
-     */
     public function getJWTCustomClaims() 
     { 
         return []; 
