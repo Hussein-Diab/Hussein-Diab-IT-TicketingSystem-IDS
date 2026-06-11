@@ -1,6 +1,6 @@
 # Hussein-Diab-IT-TicketingSystem-IDS
 
-This is an IT Ticketing System project developed using Laravel for IDS Internship.
+This is an IT Ticketing System project developed using PHP Laravel as part of IDS Internship.
 
 ## Description
 A web-based system that allows users to create, manage, and track IT support tickets efficiently.
