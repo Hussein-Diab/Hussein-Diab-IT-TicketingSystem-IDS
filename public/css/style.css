@@ -5,9 +5,7 @@
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* =====================
-   LOGIN PAGE
-===================== */
+
 body {
     background: linear-gradient(135deg, #8B83F7, #5A52D5);
     min-height: 100vh;
@@ -49,12 +47,12 @@ body {
     object-fit: cover;
 }
 
-.logo-circle span {
+/* .logo-circle span {
     font-size: 13px;
     color: #888;
-}
+} */
 
-.login-title {
+.login-title { 
     font-size: 22px;
     font-weight: 800;
     color: #1a1a2e;

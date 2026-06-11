@@ -2,7 +2,6 @@
 
 @section('content')
 
-{{-- Topbar --}}
 <div class="topbar">
     <div class="topbar-title">All Tickets</div>
     <div class="topbar-right">
@@ -18,7 +17,6 @@
 
 <div class="page-content">
 
-    {{-- Success Message --}}
     @if(session('success'))
     <div class="alert-success">
         <i class="bi bi-check-circle"></i>
@@ -26,7 +24,6 @@
     </div>
     @endif
 
-    {{-- Page Header --}}
     <div class="page-header">
         <div class="page-title">Tickets</div>
         <a href="/tickets/create" class="btn-primary">
@@ -34,7 +31,6 @@
         </a>
     </div>
 
-    {{-- Filters --}}
     <div class="filters-bar">
         <div class="search-box">
             <i class="bi bi-search" style="color:#aaa"></i>
@@ -59,7 +55,6 @@
         </select>
     </div>
 
-    {{-- Table --}}
     <div class="table-card">
         <table id="ticketsTable">
             <thead>
@@ -147,7 +142,6 @@
             </tbody>
         </table>
 
-        {{-- Pagination --}}
         <div class="pagination-bar">
             <div class="page-info">
                 Showing {{ $tickets->firstItem() }} 
@@ -160,14 +154,28 @@
 </div>
 
 <script>
-// Simple search filter
-document.getElementById('searchInput').addEventListener('keyup', function() {
-    let search = this.value.toLowerCase();
-    let rows = document.querySelectorAll('#ticketsTable tbody tr');
+function filterTable() {
+    const searchText = document.getElementById('searchInput').value.toLowerCase();
+    const statusText = document.getElementById('statusFilter').value.toLowerCase();
+    const priorityText = document.getElementById('priorityFilter').value.toLowerCase();   
+    const rows = document.querySelectorAll('#ticketsTable tbody tr');
     rows.forEach(row => {
-        row.style.display = row.innerText.toLowerCase().includes(search) ? '' : 'none';
+        const rowText = row.innerText.toLowerCase();
+        const matchesSearch = rowText.includes(searchText);
+        const matchesStatus = rowText.includes(statusText);
+        const matchesPriority = rowText.includes(priorityText);
+        if (matchesSearch && matchesStatus && matchesPriority) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
     });
-});
+}
+
+document.getElementById('searchInput').addEventListener('keyup', filterTable);
+document.getElementById('statusFilter').addEventListener('change', filterTable);
+document.getElementById('priorityFilter').addEventListener('change', filterTable);
 </script>
+
 
 @endsection

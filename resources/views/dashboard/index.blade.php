@@ -2,7 +2,6 @@
 
 @section('content')
 
-{{-- Topbar --}}
 <div class="topbar">
     <div class="topbar-title">Dashboard</div>
     <div class="topbar-right">
@@ -16,10 +15,8 @@
     </div>
 </div>
 
-{{-- Page Content --}}
 <div class="page-content">
 
-    {{-- Stats Cards --}}
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-icon purple">
@@ -55,10 +52,8 @@
         </div>
     </div>
 
-    {{-- Bottom Grid --}}
     <div class="bottom-grid">
 
-        {{-- Recent Tickets --}}
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Recent Tickets</div>
@@ -89,7 +84,6 @@
             @endforelse
         </div>
 
-        {{-- Tickets by Category --}}
         <div class="card">
             <div class="card-header">
                 <div class="card-title">Tickets by Category</div>

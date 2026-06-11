@@ -21,9 +21,6 @@ class AuthController extends Controller
             'password' => 'required|min:6', 
         ]); 
 
-
-
-
         $user = User::where('Email', $request->email)->first(); 
 
         if (!$user || !Hash::check($request->password, $user->Password)) { 
@@ -32,13 +29,8 @@ class AuthController extends Controller
             ]); 
         } 
 
-
-
         $token = JWTAuth::fromUser($user);
 
-
-
-        $token = JWTAuth::fromUser($user);
 
         return redirect('/dashboard')
             ->cookie('jwt_token', $token, 60, null, null, false, true); 

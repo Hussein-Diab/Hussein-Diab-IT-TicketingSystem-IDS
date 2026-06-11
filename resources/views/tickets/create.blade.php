@@ -2,7 +2,6 @@
 
 @section('content')
 
-{{-- Topbar --}}
 <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
         <a href="/tickets" style="color:#888;font-size:18px">
@@ -22,7 +21,7 @@
 
         <div class="form-section-title">Ticket Information</div>
 
-        {{-- Errors --}}
+        {{-- hone errors --}}
         @if($errors->any())
         <div class="alert-error">
             @foreach($errors->all() as $error)
@@ -34,7 +33,6 @@
         <form method="POST" action="/tickets">
             @csrf
 
-            {{-- Title --}}
             <div class="form-group">
                 <label class="form-label">
                     Title <span class="form-required">*</span>
@@ -47,7 +45,6 @@
                        required>
             </div>
 
-            {{-- Category + Priority --}}
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label">
@@ -79,7 +76,6 @@
                 </div>
             </div>
 
-            {{-- Description --}}
             <div class="form-group">
                 <label class="form-label">
                     Description <span class="form-required">*</span>
@@ -91,7 +87,7 @@
                           required>{{ old('Description') }}</textarea>
             </div>
 
-            {{-- Actions --}}
+           
             <div class="form-actions">
                 <a href="/tickets" class="btn-secondary">Cancel</a>
                 <button type="submit" class="btn-primary">
