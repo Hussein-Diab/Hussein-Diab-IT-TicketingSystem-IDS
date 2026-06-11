@@ -22,7 +22,6 @@
 <div class="page-content">
     <div class="show-grid">
 
-        {{-- Left: Ticket Details --}}
         <div class="form-card">
             <div class="form-section-title">Ticket Details</div>
 
@@ -82,7 +81,6 @@
             </div>
         </div>
 
-        {{-- Right: Actions --}}
         <div>
             <div class="form-card">
                 <div class="form-section-title">Actions</div>

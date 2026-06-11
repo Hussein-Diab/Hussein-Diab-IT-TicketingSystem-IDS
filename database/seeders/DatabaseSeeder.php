@@ -75,9 +75,16 @@ class DatabaseSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now()
             ],
+            [
+                'Name' => 'Hussein Diab',
+                'Email' => 'hsendiab21@gmail.com',
+                'Password' => Hash::make('password123'),
+                'RoleId' => 1, 
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
 
-        // Sample Tickets
         DB::table('Tickets')->insert([
             [
                 'RefNumber'   => 'TKT-001',
