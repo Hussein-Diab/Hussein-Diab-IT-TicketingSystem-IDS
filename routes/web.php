@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\ForgotPasswordController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -31,4 +32,7 @@ Route::middleware('jwt.cookie')->group(function () {
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
+Route::get('/forgot-password',[ForgotPasswordController::class, 'showForgotForm'])->name('forgot-password');
+Route::post('/forgot-password',[ForgotPasswordController::class, 'sendResetLink']);
+Route::get('/reset-password/{token}',[ForgotPasswordController::class, 'showResetForm'])->name('reset-password');
+Route::post('/reset-password',[ForgotPasswordController::class, 'resetPassword']);
