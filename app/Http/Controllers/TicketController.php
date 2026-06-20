@@ -9,17 +9,32 @@ use App\Models\Priority;
 use App\Models\Status;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use App\Models\User;
 
 class TicketController extends Controller
 {
     public function index()
     {
-        $tickets = Ticket::with([
-            'category',
-            'priority',
-            'status',
-            'user'
-        ])->latest()->paginate(10);
+        $user = auth()->user();
+
+        if ($user->isAdminOrManager()) {
+            $tickets = Ticket::with([
+                'category',
+                'priority',
+                'status',
+                'user'
+            ])->latest()->paginate(10);
+        } else {
+            $tickets = Ticket::with([
+                'category',
+                'priority',
+                'status',
+                'user'
+            ])
+                ->where('UserId', $user->Id)
+                ->latest()
+                ->paginate(10);
+        }
 
         return view('tickets.index', compact('tickets'));
     }
@@ -27,13 +42,18 @@ class TicketController extends Controller
     public function create()
     {
         $categories = Category::all();
-        $priorities  = Priority::all();
+        $priorities = Priority::all();
+        $employees  = null;
+        if (auth()->user()->isAdminOrManager()) {
+            $employees = User::where('RoleId', 3)->get(); // Get all employees
+        }
+
         return view('tickets.create', compact(
             'categories',
-            'priorities'
+            'priorities',
+            'employees'
         ));
     }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -43,7 +63,16 @@ class TicketController extends Controller
             'PriorityId'  => 'required|exists:Priorities,Id',
         ]);
 
-        $refNumber = 'TKT-' . strtoupper(Str::random(6));
+        $refNumber = 'TKT-' . str_pad(
+            Ticket::count() + 1,
+            3,
+            '0',
+            STR_PAD_LEFT
+        );
+        $userId = auth()->user()->isAdminOrManager() && $request->UserId
+            ? $request->UserId
+            : auth()->user()->Id;
+
         Ticket::create([
             'RefNumber'   => $refNumber,
             'Title'       => $request->Title,
@@ -51,7 +80,8 @@ class TicketController extends Controller
             'CategoryId'  => $request->CategoryId,
             'PriorityId'  => $request->PriorityId,
             'StatusId'    => 1,
-            'UserId'      => Auth::id(),
+            'UserId'      => $userId,
+            'AssignedTo'  => $request->AssignedTo ?? null,
         ]);
 
         return redirect('/tickets')
@@ -64,17 +94,27 @@ class TicketController extends Controller
             'category',
             'priority',
             'status',
-            'user'
-        ])->findOrFail($id);
+            'user',
+            'comments.user'
+        ])->findOrFail((int)$id);
 
         return view('tickets.show', compact('ticket'));
     }
 
     public function edit($id)
     {
-        $ticket     = Ticket::findOrFail($id);
+        $ticket = Ticket::findOrFail((int)$id);
+
+        if (
+            auth()->user()->isEmployee() &&
+            $ticket->UserId !== auth()->user()->Id
+        ) {
+            return redirect('/tickets')
+                ->withErrors(['error' => 'You can only edit your own tickets.']);
+        }
+
         $categories = Category::all();
-        $priorities  = Priority::all();
+        $priorities = Priority::all();
         $statuses   = Status::all();
 
         return view('tickets.edit', compact(
@@ -110,7 +150,7 @@ class TicketController extends Controller
 
     public function destroy($id)
     {
-        $ticket = Ticket::findOrFail($id);
+        $ticket = Ticket::findOrFail((int)$id);
         $ticket->delete();
 
         return redirect('/tickets')

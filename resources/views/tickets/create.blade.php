@@ -75,7 +75,33 @@
                     </select>
                 </div>
             </div>
-
+            
+    @if(auth()->user()->isAdminOrManager())
+    <div class="form-row">
+        <div class="form-group">
+            <label class="form-label">Assign To Employee</label>
+            <select name="UserId" class="form-control">
+                <option value="">Select employee...</option>
+                @foreach($employees as $employee)
+                <option value="{{ $employee->Id }}">
+                    {{ $employee->Name }}
+                </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Assign To Agent</label>
+            <select name="AssignedTo" class="form-control">
+                <option value="">Select agent...</option>
+                @foreach(\App\Models\User::where('RoleId', 2)->get() as $agent)
+                <option value="{{ $agent->Id }}">
+                    {{ $agent->Name }}
+                </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+    @endif
             <div class="form-group">
                 <label class="form-label">
                     Description <span class="form-required">*</span>

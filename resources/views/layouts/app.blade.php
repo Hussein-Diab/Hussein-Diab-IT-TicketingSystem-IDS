@@ -17,26 +17,35 @@
             <i class="bi bi-headset"></i>
             HelpDesk IDS
         </div>
-        <div class="nav-section">
-            <a href="/dashboard"
-               class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
-                <i class="bi bi-house"></i> Dashboard
-            </a>
-            <a href="/tickets"
-               class="nav-item {{ request()->is('tickets') ? 'active' : '' }}">
-                <i class="bi bi-ticket"></i> All Tickets
-            </a>
-            <a href="/tickets/create"
-               class="nav-item {{ request()->is('tickets/create') ? 'active' : '' }}">
-                <i class="bi bi-plus-circle"></i> New Ticket
-            </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-bar-chart"></i> Reports
-            </a>
-            <a href="#" class="nav-item">
-                <i class="bi bi-bell"></i> Notifications
-            </a>
-        </div>
+         <div class="nav-section">
+                <a href="/dashboard"
+                class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
+                    <i class="bi bi-house"></i> Dashboard
+                </a>
+                <a href="/tickets"
+                class="nav-item {{ request()->is('tickets') ? 'active' : '' }}">
+                    <i class="bi bi-ticket"></i>
+                    {{-- Show different label based on role --}}
+                    {{ auth()->user()->isAdminOrManager() ? 'All Tickets' : 'My Tickets' }}
+                </a>
+                <a href="/tickets/create"
+                class="nav-item {{ request()->is('tickets/create') ? 'active' : '' }}">
+                    <i class="bi bi-plus-circle"></i> New Ticket
+                </a>
+
+                @if(auth()->user()->isAdminOrManager())
+                <a href="#" class="nav-item">
+                    <i class="bi bi-bar-chart"></i> Reports
+                </a>
+                <a href="#" class="nav-item">
+                    <i class="bi bi-people"></i> Users
+                </a>
+                @endif
+
+                <a href="#" class="nav-item">
+                    <i class="bi bi-bell"></i> Notifications
+                </a>
+            </div>
         <div class="sidebar-bottom">
             <div class="avatar">
                 {{ strtoupper(substr(auth()->user()->Name, 0, 2)) }}

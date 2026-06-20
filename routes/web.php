@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\CommentController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -12,10 +13,6 @@ Route::get('/', function () {
 
 
 Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
-
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-
-
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
@@ -29,10 +26,12 @@ Route::middleware('jwt.cookie')->group(function () {
     Route::get('/tickets/{id}/edit', [TicketController::class, 'edit']);
     Route::put('/tickets/{id}',  [TicketController::class, 'update']);
     Route::delete('/tickets/{id}',  [TicketController::class, 'destroy']);
+    Route::post(
+        '/tickets/{ticketId}/comments',
+        [CommentController::class, 'store']
+    );
 });
-
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/forgot-password',[ForgotPasswordController::class, 'showForgotForm'])->name('forgot-password');
-Route::post('/forgot-password',[ForgotPasswordController::class, 'sendResetLink']);
-Route::get('/reset-password/{token}',[ForgotPasswordController::class, 'showResetForm'])->name('reset-password');
-Route::post('/reset-password',[ForgotPasswordController::class, 'resetPassword']);
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])->name('forgot-password');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
+Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('reset-password');
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);

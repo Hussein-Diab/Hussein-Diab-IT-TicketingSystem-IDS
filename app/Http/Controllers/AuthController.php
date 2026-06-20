@@ -39,14 +39,11 @@ class AuthController extends Controller
 
     public function logout() 
     { 
-
         try {
             JWTAuth::invalidate(JWTAuth::getToken());
         } catch (\Exception $e) {
 
         }
-
-
         return redirect('/login')->withoutCookie('jwt_token'); 
     } 
 }

@@ -8,7 +8,8 @@ class Ticket extends Model
 {
     protected $table = 'Tickets';
     protected $primaryKey = 'Id';
-
+    protected $keyType    = 'int';
+    public $incrementing  = true;
     protected $fillable = [
         'RefNumber',
         'Title',
@@ -43,5 +44,13 @@ class Ticket extends Model
     public function assignedAgent()
     {
         return $this->belongsTo(User::class, 'AssignedTo', 'Id');
+    }
+    public function comments()
+    {
+        return $this->hasMany(
+            TicketComment::class,
+            'TicketId',
+            'Id'
+        )->orderBy('created_at', 'asc');
     }
 }
