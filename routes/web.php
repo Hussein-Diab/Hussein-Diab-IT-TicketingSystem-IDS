@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -30,6 +31,9 @@ Route::middleware('jwt.cookie')->group(function () {
         '/tickets/{ticketId}/comments',
         [CommentController::class, 'store']
     );
+    Route::get('/notifications',[NotificationController::class, 'index']);
+    Route::post('/notifications/{id}/read',[NotificationController::class, 'markAsRead']);
+    Route::post('/notifications/read-all',[NotificationController::class, 'markAllAsRead']);
 });
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])->name('forgot-password');
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);

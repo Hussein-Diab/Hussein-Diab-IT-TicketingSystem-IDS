@@ -11,41 +11,55 @@
 <body>
 
 @auth
+@php
+    $unreadCount = \App\Models\Notification::where('UserId', auth()->user()->Id)
+        ->where('IsRead', false)
+        ->count();
+@endphp
+
 <div class="app-layout">
     <div class="sidebar">
         <div class="sidebar-logo">
             <i class="bi bi-headset"></i>
             HelpDesk IDS
         </div>
-         <div class="nav-section">
-                <a href="/dashboard"
-                class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-house"></i> Dashboard
-                </a>
-                <a href="/tickets"
-                class="nav-item {{ request()->is('tickets') ? 'active' : '' }}">
-                    <i class="bi bi-ticket"></i>
-                    {{-- Show different label based on role --}}
-                    {{ auth()->user()->isAdminOrManager() ? 'All Tickets' : 'My Tickets' }}
-                </a>
-                <a href="/tickets/create"
-                class="nav-item {{ request()->is('tickets/create') ? 'active' : '' }}">
-                    <i class="bi bi-plus-circle"></i> New Ticket
-                </a>
 
-                @if(auth()->user()->isAdminOrManager())
-                <a href="#" class="nav-item">
-                    <i class="bi bi-bar-chart"></i> Reports
-                </a>
-                <a href="#" class="nav-item">
-                    <i class="bi bi-people"></i> Users
-                </a>
+        <div class="nav-section">
+            <a href="/dashboard"
+               class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
+                <i class="bi bi-house"></i> Dashboard
+            </a>
+
+            <a href="/tickets"
+               class="nav-item {{ request()->is('tickets') ? 'active' : '' }}">
+                <i class="bi bi-ticket"></i>
+                {{ auth()->user()->isAdminOrManager() ? 'All Tickets' : 'My Tickets' }}
+            </a>
+
+            <a href="/tickets/create"
+               class="nav-item {{ request()->is('tickets/create') ? 'active' : '' }}">
+                <i class="bi bi-plus-circle"></i> New Ticket
+            </a>
+
+            @if(auth()->user()->isAdminOrManager())
+            <a href="#" class="nav-item">
+                <i class="bi bi-bar-chart"></i> Reports
+            </a>
+            <a href="#" class="nav-item">
+                <i class="bi bi-people"></i> Users
+            </a>
+            @endif
+
+            {{-- Notifications with unread count badge --}}
+            <a href="/notifications"
+               class="nav-item {{ request()->is('notifications*') ? 'active' : '' }}">
+                <i class="bi bi-bell"></i> Notifications
+                @if($unreadCount > 0)
+                <span class="notif-count">{{ $unreadCount }}</span>
                 @endif
+            </a>
+        </div>
 
-                <a href="#" class="nav-item">
-                    <i class="bi bi-bell"></i> Notifications
-                </a>
-            </div>
         <div class="sidebar-bottom">
             <div class="avatar">
                 {{ strtoupper(substr(auth()->user()->Name, 0, 2)) }}
@@ -54,7 +68,7 @@
                 <div class="sidebar-username">{{ auth()->user()->Name }}</div>
                 <div class="sidebar-role">
                     @php
-                        $roles = [1=>'Admin',2=>'Agent',3=>'Employee',4=>'Manager'];
+                        $roles = [1=>'Admin', 2=>'Agent', 3=>'Employee', 4=>'Manager'];
                         echo $roles[auth()->user()->RoleId] ?? 'User';
                     @endphp
                 </div>

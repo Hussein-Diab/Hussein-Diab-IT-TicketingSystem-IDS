@@ -82,7 +82,20 @@
                     @endforeach
                 </select>
             </div>
-
+                @if(auth()->user()->isAdminOrManager())
+                <div class="form-group">
+                    <label class="form-label">Assign To Agent</label>
+                    <select name="AssignedTo" class="form-control">
+                        <option value="">Unassigned</option>
+                        @foreach(\App\Models\User::where('RoleId', 2)->get() as $agent)
+                        <option value="{{ $agent->Id }}"
+                            {{ $ticket->AssignedTo == $agent->Id ? 'selected' : '' }}>
+                            {{ $agent->Name }}
+                        </option>
+                        @endforeach
+                    </select>
+                </div>
+                @endif
             <div class="form-group">
                 <label class="form-label">Description</label>
                 <textarea name="Description"

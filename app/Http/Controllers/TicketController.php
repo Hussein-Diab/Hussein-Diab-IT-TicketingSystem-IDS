@@ -10,6 +10,7 @@ use App\Models\Status;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class TicketController extends Controller
 {
@@ -24,6 +25,16 @@ class TicketController extends Controller
                 'status',
                 'user'
             ])->latest()->paginate(10);
+        } elseif ($user->isAgent()) {
+            $tickets = Ticket::with([
+                'category',
+                'priority',
+                'status',
+                'user'
+            ])
+                ->where('AssignedTo', $user->Id)
+                ->latest()
+                ->paginate(10);
         } else {
             $tickets = Ticket::with([
                 'category',
@@ -45,7 +56,7 @@ class TicketController extends Controller
         $priorities = Priority::all();
         $employees  = null;
         if (auth()->user()->isAdminOrManager()) {
-            $employees = User::where('RoleId', 3)->get(); // Get all employees
+            $employees = User::where('RoleId', 3)->get();
         }
 
         return view('tickets.create', compact(
@@ -63,17 +74,14 @@ class TicketController extends Controller
             'PriorityId'  => 'required|exists:Priorities,Id',
         ]);
 
-        $refNumber = 'TKT-' . str_pad(
-            Ticket::count() + 1,
-            3,
-            '0',
-            STR_PAD_LEFT
-        );
+        $refNumber = 'TKT-' . strtoupper(uniqid());
+
         $userId = auth()->user()->isAdminOrManager() && $request->UserId
             ? $request->UserId
             : auth()->user()->Id;
 
-        Ticket::create([
+
+        $ticket = Ticket::create([
             'RefNumber'   => $refNumber,
             'Title'       => $request->Title,
             'Description' => $request->Description,
@@ -84,10 +92,17 @@ class TicketController extends Controller
             'AssignedTo'  => $request->AssignedTo ?? null,
         ]);
 
+        DB::table('ActivityLogs')->insert([
+            'UserId'     => auth()->user()->Id,
+            'TicketId'   => $ticket->Id,
+            'Action'     => 'Ticket ' . $refNumber . ' was created by ' . auth()->user()->Name,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         return redirect('/tickets')
             ->with('success', 'Ticket created successfully!');
     }
-
     public function show($id)
     {
         $ticket = Ticket::with([
@@ -135,22 +150,57 @@ class TicketController extends Controller
             'StatusId'    => 'required',
         ]);
 
-        $ticket = Ticket::findOrFail($id);
+        $ticket = Ticket::findOrFail((int)$id);
+        $oldStatus   = $ticket->StatusId;
+        $oldPriority = $ticket->PriorityId;
+
         $ticket->update([
             'Title'       => $request->Title,
             'Description' => $request->Description,
             'CategoryId'  => $request->CategoryId,
             'PriorityId'  => $request->PriorityId,
             'StatusId'    => $request->StatusId,
+            'AssignedTo'  => $request->AssignedTo ?? null,
+        ]);
+
+        $action = 'Ticket ' . $ticket->RefNumber . ' was updated by ' . auth()->user()->Name;
+
+        if ($oldStatus != $request->StatusId) {
+            $oldStatusName = DB::table('Statuses')->where('Id', $oldStatus)->value('Name');
+            $newStatusName = DB::table('Statuses')->where('Id', $request->StatusId)->value('Name');
+            $action .= ' — Status changed from ' . $oldStatusName . ' to ' . $newStatusName;
+        }
+
+        if ($oldPriority != $request->PriorityId) {
+            $oldPriorityName = DB::table('Priorities')->where('Id', $oldPriority)->value('Name');
+            $newPriorityName = DB::table('Priorities')->where('Id', $request->PriorityId)->value('Name');
+            $action .= ' — Priority changed from ' . $oldPriorityName . ' to ' . $newPriorityName;
+        }
+
+        DB::table('ActivityLogs')->insert([
+            'UserId'     => auth()->user()->Id,
+            'TicketId'   => $ticket->Id,
+            'Action'     => $action,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         return redirect('/tickets')
             ->with('success', 'Ticket updated successfully!');
     }
-
     public function destroy($id)
     {
         $ticket = Ticket::findOrFail((int)$id);
+        DB::table('ActivityLogs')->insert([
+            'UserId'     => auth()->user()->Id,
+            'TicketId'   => $ticket->Id,
+            'Action'     => 'Ticket ' . $ticket->RefNumber . ' was deleted by ' . auth()->user()->Name,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('ActivityLogs')->where('TicketId', $ticket->Id)->delete();
+        DB::table('TicketComments')->where('TicketId', $ticket->Id)->delete();
+        DB::table('TicketAttachments')->where('TicketId', $ticket->Id)->delete();
         $ticket->delete();
 
         return redirect('/tickets')
