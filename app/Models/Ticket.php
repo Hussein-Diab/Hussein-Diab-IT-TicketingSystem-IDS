@@ -53,4 +53,12 @@ class Ticket extends Model
             'Id'
         )->orderBy('created_at', 'asc');
     }
+    public function attachments()
+    {
+        return $this->hasMany(
+            TicketAttachment::class,
+            'TicketId',
+            'Id'
+        );
+    }
 }

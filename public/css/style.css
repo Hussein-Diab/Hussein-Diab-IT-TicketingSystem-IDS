@@ -52,7 +52,7 @@ body {
     color: #888;
 } */
 
-.login-title { 
+.login-title {
     font-size: 22px;
     font-weight: 800;
     color: #1a1a2e;
@@ -868,6 +868,7 @@ tr:hover td {
     line-height: 1.5;
     padding-left: 42px;
 }
+
 .notif-count {
     background: #fff;
     color: #6C63FF;
@@ -877,6 +878,7 @@ tr:hover td {
     border-radius: 10px;
     margin-left: auto;
 }
+
 .notification-row {
     display: flex;
     align-items: center;
@@ -886,14 +888,18 @@ tr:hover td {
     transition: background 0.15s;
 }
 
-.notification-row:last-child { border: none; }
+.notification-row:last-child {
+    border: none;
+}
 
 .notification-row.unread {
     background: #faf9ff;
     border-left: 3px solid #6C63FF;
 }
 
-.notification-row:hover { background: #f9f9fb; }
+.notification-row:hover {
+    background: #f9f9fb;
+}
 
 .notification-icon {
     width: 36px;
@@ -907,7 +913,9 @@ tr:hover td {
     flex-shrink: 0;
 }
 
-.notification-content { flex: 1; }
+.notification-content {
+    flex: 1;
+}
 
 .notification-message {
     font-size: 13px;
@@ -919,4 +927,62 @@ tr:hover td {
     font-size: 11px;
     color: #aaa;
     margin-top: 3px;
+}
+
+
+.upload-box {
+    border: 2px dashed #c0b8ff;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    background: #faf9ff;
+    cursor: pointer;
+    transition: border 0.2s;
+}
+
+.upload-box:hover {
+    border-color: #6C63FF;
+    background: #f0eeff;
+}
+
+.upload-text {
+    font-size: 13px;
+    color: #888;
+    margin-top: 8px;
+}
+
+.upload-sub {
+    font-size: 11px;
+    color: #bbb;
+    margin-top: 4px;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f4;
+}
+
+.attachment-item:last-child {
+    border: none;
+}
+
+.attachment-link {
+    font-size: 13px;
+    color: #6C63FF;
+    text-decoration: none;
+}
+
+.attachment-link:hover {
+    text-decoration: underline;
+}
+
+.attachment-size {
+    font-size: 11px;
+    color: #aaa;
+}
+textarea {
+  resize: none;       
 }
