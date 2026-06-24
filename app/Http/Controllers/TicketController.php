@@ -7,9 +7,10 @@ use App\Models\Ticket;
 use App\Models\Category;
 use App\Models\Priority;
 use App\Models\Status;
+use App\Models\User;
+use App\Models\TicketAttachment;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\NotificationHelper;
 
@@ -20,29 +21,14 @@ class TicketController extends Controller
         $user = auth()->user();
 
         if ($user->isAdminOrManager()) {
-            $tickets = Ticket::with([
-                'category',
-                'priority',
-                'status',
-                'user'
-            ])->latest()->paginate(10);
+            $tickets = Ticket::with(['category', 'priority', 'status', 'user'])->latest()->paginate(10);
         } elseif ($user->isAgent()) {
-            $tickets = Ticket::with([
-                'category',
-                'priority',
-                'status',
-                'user'
-            ])
+            $tickets = Ticket::with(['category', 'priority', 'status', 'user'])
                 ->where('AssignedTo', $user->Id)
                 ->latest()
                 ->paginate(10);
         } else {
-            $tickets = Ticket::with([
-                'category',
-                'priority',
-                'status',
-                'user'
-            ])
+            $tickets = Ticket::with(['category', 'priority', 'status', 'user'])
                 ->where('UserId', $user->Id)
                 ->latest()
                 ->paginate(10);
@@ -56,30 +42,26 @@ class TicketController extends Controller
         $categories = Category::all();
         $priorities = Priority::all();
         $employees  = null;
+
         if (auth()->user()->isAdminOrManager()) {
             $employees = User::where('RoleId', 3)->get();
         }
 
-        return view('tickets.create', compact(
-            'categories',
-            'priorities',
-            'employees'
-        ));
+        return view('tickets.create', compact('categories', 'priorities', 'employees'));
     }
+
     public function store(Request $request)
     {
         $request->validate([
-            'Title'       => 'required|max:255',
-            'Description' => 'required',
-            'CategoryId'  => 'required|exists:Categories,Id',
-            'PriorityId'  => 'required|exists:Priorities,Id',
+            'Title'         => 'required|max:255',
+            'Description'   => 'required',
+            'CategoryId'    => 'required|exists:Categories,Id',
+            'PriorityId'    => 'required|exists:Priorities,Id',
+            'attachments.*' => 'nullable|file|max:5120|mimes:png,jpg,jpeg,pdf,doc,docx',
         ]);
 
         $refNumber = 'TKT-' . strtoupper(uniqid());
-
-        $userId = auth()->user()->isAdminOrManager() && $request->UserId
-            ? $request->UserId
-            : auth()->user()->Id;
+        $userId = auth()->user()->isAdminOrManager() && $request->UserId ? $request->UserId : auth()->user()->Id;
 
         $ticket = Ticket::create([
             'RefNumber'   => $refNumber,
@@ -91,6 +73,20 @@ class TicketController extends Controller
             'UserId'      => $userId,
             'AssignedTo'  => $request->AssignedTo ?? null,
         ]);
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('attachments', $fileName, 'public');
+                TicketAttachment::create([
+                    'TicketId' => $ticket->Id,
+                    'FileName' => $file->getClientOriginalName(),
+                    'FilePath' => $filePath,
+                    'FileSize' => $file->getSize(),
+                ]);
+            }
+        }
 
         DB::table('ActivityLogs')->insert([
             'UserId'     => auth()->user()->Id,
@@ -111,9 +107,9 @@ class TicketController extends Controller
             );
         }
 
-        return redirect('/tickets')
-            ->with('success', 'Ticket created successfully!');
+        return redirect('/tickets')->with('success', 'Ticket created successfully!');
     }
+
     public function show($id)
     {
         $ticket = Ticket::with([
@@ -121,28 +117,29 @@ class TicketController extends Controller
             'priority',
             'status',
             'user',
-            'comments.user'
+            'comments.user',
+            'attachments'
         ])->findOrFail((int)$id);
 
+        $user = auth()->user();
+        if (!$this->canAccessTicket($user, $ticket)) {
+            return redirect('/tickets')
+                ->withErrors(['error' => 'You do not have permission to view this ticket.']);
+        }
         return view('tickets.show', compact('ticket'));
     }
 
     public function edit($id)
     {
         $ticket = Ticket::findOrFail((int)$id);
-
-        if (
-            auth()->user()->isEmployee() &&
-            $ticket->UserId !== auth()->user()->Id
-        ) {
+        $user = auth()->user();
+        if (!$this->canAccessTicket($user, $ticket)) {
             return redirect('/tickets')
-                ->withErrors(['error' => 'You can only edit your own tickets.']);
+                ->withErrors(['error' => 'You do not have permission to edit this ticket.']);
         }
-
         $categories = Category::all();
         $priorities = Priority::all();
         $statuses   = Status::all();
-
         return view('tickets.edit', compact(
             'ticket',
             'categories',
@@ -153,33 +150,41 @@ class TicketController extends Controller
 
     public function update(Request $request, $id)
     {
+        $ticket = Ticket::findOrFail((int)$id);
+        $user   = auth()->user();
+        if (!$this->canAccessTicket($user, $ticket)) {
+            return redirect('/tickets')
+                ->withErrors(['error' => 'You do not have permission to update this ticket.']);
+        }
         $request->validate([
-            'Title'=> 'required|max:255',
-            'Description'=> 'required',
-            'CategoryId'=> 'required',
-            'PriorityId'=> 'required',
-            'StatusId'=> 'required',
+            'Title'       => 'required|max:255',
+            'Description' => 'required',
+            'CategoryId'  => 'required|exists:Categories,Id',
+            'PriorityId'  => 'required|exists:Priorities,Id',
+            'StatusId'    => 'required|exists:Statuses,Id',
         ]);
 
         $ticket = Ticket::findOrFail((int)$id);
-        $oldStatus= $ticket->StatusId;
-        $oldPriority= $ticket->PriorityId;
-        $oldAssigned= $ticket->AssignedTo;
+        $oldStatus = $ticket->StatusId;
+        $oldPriority = $ticket->PriorityId;
+        $oldAssigned = $ticket->AssignedTo;
 
         $ticket->update([
-            'Title' => $request->Title,
+            'Title'       => $request->Title,
             'Description' => $request->Description,
-            'CategoryId' => $request->CategoryId,
-            'PriorityId' => $request->PriorityId,
-            'StatusId' => $request->StatusId,
-            'AssignedTo' => $request->AssignedTo ?? null,
+            'CategoryId'  => $request->CategoryId,
+            'PriorityId'  => $request->PriorityId,
+            'StatusId'    => $request->StatusId,
+            'AssignedTo'  => $request->AssignedTo ?? null,
         ]);
+
         $action = 'Ticket ' . $ticket->RefNumber . ' was updated by ' . auth()->user()->Name;
 
         if ($oldStatus != $request->StatusId) {
             $oldStatusName = DB::table('Statuses')->where('Id', $oldStatus)->value('Name');
             $newStatusName = DB::table('Statuses')->where('Id', $request->StatusId)->value('Name');
             $action .= ' — Status changed from ' . $oldStatusName . ' to ' . $newStatusName;
+
             NotificationHelper::notifyEmployee(
                 $ticket->UserId,
                 'Your ticket ' . $ticket->RefNumber . ' status changed from ' . $oldStatusName . ' to ' . $newStatusName
@@ -200,32 +205,49 @@ class TicketController extends Controller
         }
 
         DB::table('ActivityLogs')->insert([
-            'UserId'=> auth()->user()->Id,
-            'TicketId' => $ticket->Id,
-            'Action'  => $action,
-            'created_at'=> now(),
-            'updated_at'=> now(),
+            'UserId'     => auth()->user()->Id,
+            'TicketId'   => $ticket->Id,
+            'Action'     => $action,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
-        return redirect('/tickets')
-            ->with('success', 'Ticket updated successfully!');
+        return redirect('/tickets')->with('success', 'Ticket updated successfully!');
     }
+
     public function destroy($id)
     {
         $ticket = Ticket::findOrFail((int)$id);
-        DB::table('ActivityLogs')->insert([
-            'UserId'=> auth()->user()->Id,
-            'TicketId'=> $ticket->Id,
-            'Action'=> 'Ticket ' . $ticket->RefNumber . ' was deleted by ' . auth()->user()->Name,
-            'created_at'=> now(),
-            'updated_at'=> now(),
-        ]);
+        $user   = auth()->user();
+        $refNumber = $ticket->RefNumber;
+        if (!$user->isAdminOrManager()) {
+            return redirect('/tickets')
+                ->withErrors(['error' => 'You do not have permission to delete tickets.']);
+        }
         DB::table('ActivityLogs')->where('TicketId', $ticket->Id)->delete();
         DB::table('TicketComments')->where('TicketId', $ticket->Id)->delete();
         DB::table('TicketAttachments')->where('TicketId', $ticket->Id)->delete();
+
         $ticket->delete();
 
-        return redirect('/tickets')
-            ->with('success', 'Ticket deleted successfully!');
+        DB::table('ActivityLogs')->insert([
+            'UserId'     => auth()->user()->Id,
+            'TicketId'   => null,
+            'Action'     => 'Ticket ' . $refNumber . ' was deleted by ' . auth()->user()->Name,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect('/tickets')->with('success', 'Ticket deleted successfully!');
+    }
+    private function canAccessTicket($user, $ticket)
+    {
+        if ($user->isAdminOrManager()) {
+            return true;
+        }
+        if ($user->isAgent()) {
+            return $ticket->AssignedTo == $user->Id;
+        }
+        return $ticket->UserId == $user->Id;
     }
 }

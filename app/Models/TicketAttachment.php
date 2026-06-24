@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TicketAttachment extends Model
 {
-    protected $table      = 'TicketAttachments';
+    protected $table      = 'ticketattachments';
     protected $primaryKey = 'Id';
     protected $keyType    = 'int';
     public $incrementing  = true;

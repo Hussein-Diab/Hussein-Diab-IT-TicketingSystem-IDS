@@ -301,7 +301,7 @@ body {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 12px;
     margin-bottom: 16px;
 }
@@ -983,6 +983,23 @@ tr:hover td {
     font-size: 11px;
     color: #aaa;
 }
+
 textarea {
-  resize: none;       
+    resize: none;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.stats-grid-6 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+.card canvas {
+    max-height: 200px !important;
 }
