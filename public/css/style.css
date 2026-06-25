@@ -1000,6 +1000,21 @@ textarea {
     gap: 12px;
     margin-bottom: 16px;
 }
+
 .card canvas {
     max-height: 200px !important;
+}
+
+.pagination-bar svg {
+    width: 20px;
+    height: 20px;
+}
+
+.pagination-bar nav>div.hidden.sm\:flex-1.sm\:flex.sm\:items-center.sm\:justify-between>div:nth-child(2)>span {
+    display: flex;
+    align-items: center;
+}
+
+.pagination-bar p.text-sm.text-gray-700.leading-5 {
+    display: none;
 }
