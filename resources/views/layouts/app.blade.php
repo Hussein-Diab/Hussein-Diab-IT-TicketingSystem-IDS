@@ -45,12 +45,11 @@
             <a href="#" class="nav-item">
                 <i class="bi bi-bar-chart"></i> Reports
             </a>
-            <a href="#" class="nav-item">
+            <a href="/users" class="nav-item {{request()->is('users*') ? 'active' : ''}}">
                 <i class="bi bi-people"></i> Users
             </a>
             @endif
 
-            {{-- Notifications with unread count badge --}}
             <a href="/notifications"
                class="nav-item {{ request()->is('notifications*') ? 'active' : '' }}">
                 <i class="bi bi-bell"></i> Notifications

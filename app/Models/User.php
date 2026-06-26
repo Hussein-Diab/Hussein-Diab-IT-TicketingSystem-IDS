@@ -14,7 +14,8 @@ class User extends Authenticatable implements JWTSubject
         'Name',
         'Email',
         'Password',
-        'RoleId'
+        'RoleId',
+        'IsActive',
     ];
 
     protected $hidden = [
@@ -58,5 +59,17 @@ class User extends Authenticatable implements JWTSubject
     public function isAdminOrManager()
     {
         return in_array($this->RoleId, [1, 4]);
+    }
+    public function scopeActive($query)
+    {
+        return $query->where('IsActive', true);
+    }
+    public function ticketsCreated()
+    {
+        return $this->hasMany(Ticket::class, 'UserId', 'Id');
+    }
+    public function ticketsAssigned()
+    {
+        return $this->hasMany(Ticket::class, 'AssignedTo', 'Id');
     }
 }

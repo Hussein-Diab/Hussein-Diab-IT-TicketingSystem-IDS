@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
                 'Email'      => 'admin@helpdesk.com',
                 'Password'   => Hash::make('password123'),
                 'RoleId'     => 1,
+                'IsActive' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -56,6 +57,7 @@ class DatabaseSeeder extends Seeder
                 'Email'      => 'agent@helpdesk.com',
                 'Password'   => Hash::make('password123'),
                 'RoleId'     => 2,
+                'IsActive' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -64,6 +66,7 @@ class DatabaseSeeder extends Seeder
                 'Email'      => 'employee@helpdesk.com',
                 'Password'   => Hash::make('password123'),
                 'RoleId'     => 3,
+                'IsActive' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -72,6 +75,7 @@ class DatabaseSeeder extends Seeder
                 'Email'      => 'manager@helpdesk.com',
                 'Password'   => Hash::make('password123'),
                 'RoleId'     => 4,
+                'IsActive' => true,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -79,7 +83,8 @@ class DatabaseSeeder extends Seeder
                 'Name' => 'Hussein Diab',
                 'Email' => 'hsendiab21@gmail.com',
                 'Password' => Hash::make('password123'),
-                'RoleId' => 1, 
+                'RoleId' => 1,
+                'IsActive' => false,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
