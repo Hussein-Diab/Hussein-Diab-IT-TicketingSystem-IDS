@@ -42,7 +42,7 @@
             </a>
 
             @if(auth()->user()->isAdminOrManager())
-            <a href="#" class="nav-item">
+            <a href="/reports" class="nav-item {{request()->is('reports*') ? 'active' : ''}}">
                 <i class="bi bi-bar-chart"></i> Reports
             </a>
             <a href="/users" class="nav-item {{request()->is('users*') ? 'active' : ''}}">

@@ -8,7 +8,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\UserController;
-
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -40,6 +40,7 @@ Route::middleware('jwt.cookie')->group(function () {
     Route::get('/users/{id}',[UserController::class,'show']);
     Route::put('/users/{id}',[UserController::class,'update']);
     Route::post('/users/{id}/toggle',[UserController::class,'toggleActive']);
+    Route::get('/reports', [ReportController::class,'index']);
 });
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])->name('forgot-password');
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
