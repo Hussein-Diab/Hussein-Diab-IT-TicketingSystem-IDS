@@ -80,6 +80,10 @@
             </form>
         </div>
     </div>
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="bi bi-list"></i>
+    </button>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <div class="main-content">
         @yield('content')
@@ -89,6 +93,13 @@
 @else
 @yield('content')
 @endauth
+
+<script>
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('show');
+    document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+</script>
 
 </body>
 </html>
